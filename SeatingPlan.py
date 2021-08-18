@@ -25,6 +25,7 @@ from scipy.spatial import distance
 
 mindist = 0 ## a random small number
 sumdist = 0 ## a random small number
+minsumdist = 0 ## a random small number
 
 ### total number of combinations we need to run
 from math import factorial
@@ -57,18 +58,22 @@ for combs in allcombs: #combination of nseats
         opoints.remove(coord) ## otherpoints for distance
         dists.extend([distance.euclidean(coord, opoint) for opoint in opoints])
         
-    if min(dists) > mindist: ## maximize the minimum distance
+    if min(dists) > mindist or (min(dists) == mindist and sum(dists) > minsumdist): ## maximize the minimum distance, also reduce average distance for minimum
         mindistcomb = combs
         mindist = min(dists)
+        minsumdist = sum(dists)
+        print("min and avg distance", mindist, minsumdist)
         
     if sum(dists) > sumdist: ## maximize the sum of distance
         sumdistcomb = combs
         sumdist = sum(dists)
         
         
+        
 ## print best results
 print("Combination that maximize minimum distance: ", mindistcomb)
 print(".. with minimum distance: ", mindist)
+print(".. and average distance: ", minsumdist)
 print("\n")
 print("Combination that maximize average distance: ", sumdistcomb)
 print(".. with average distance: ", sumdist/nseats)
