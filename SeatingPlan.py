@@ -10,8 +10,8 @@ Author: Manish Jha
 
 
 #### user defined
-nrows = 4 #number of rows
-ncols = 12 #number of seats per rows
+nrows = 8 #number of rows
+ncols = 8 #number of seats per rows
 nseats = 14 #number of students 
 
 ################
@@ -22,10 +22,6 @@ coords = [(x,y) for x in range(0,ncols) for y in range(0,nrows)]
 ## find distances
 from itertools import combinations
 from scipy.spatial import distance
-
-mindist = 0 ## a random small number
-sumdist = 0 ## a random small number
-minsumdist = 0 ## a random small number
 
 ### total number of combinations we need to run
 from math import factorial
@@ -41,6 +37,8 @@ if totalcombs > 1000000:
     allcombs = [x for x in allcombs if len(set(x)) == nseats] #keep unique
     print("Got ", len(allcombs)/1000, "k random sample")
 
+mindist = 0 ## a random small number
+sumdist = 0 ## a random small number
 counter = 0
 for combs in allcombs: #combination of nseats   
 
@@ -56,27 +54,21 @@ for combs in allcombs: #combination of nseats
         
         opoints = combs.copy()
         opoints.remove(coord) ## otherpoints for distance
-        dists.extend([distance.euclidean(coord, opoint) for opoint in opoints])
-        
-    if min(dists) > mindist or (min(dists) == mindist and sum(dists) > minsumdist): ## maximize the minimum distance, also reduce average distance for minimum
+        dists.append(min([distance.euclidean(coord, opoint) for opoint in opoints])) ## we care about minimum distance only
+    
+    if min(dists) > mindist or (min(dists) == mindist and sum(dists) > sumdist): ## maximize the minimum distance, also maximize the average
         mindistcomb = combs
         mindist = min(dists)
-        minsumdist = sum(dists)
-        print("min and avg distance", mindist, minsumdist)
-        
-    if sum(dists) > sumdist: ## maximize the sum of distance
-        sumdistcomb = combs
         sumdist = sum(dists)
+        print("min and avg min distance", mindist, sumdist/nseats)
         
         
         
 ## print best results
 print("Combination that maximize minimum distance: ", mindistcomb)
 print(".. with minimum distance: ", mindist)
-print(".. and average distance: ", minsumdist)
-print("\n")
-print("Combination that maximize average distance: ", sumdistcomb)
-print(".. with average distance: ", sumdist/nseats)
+print(".. and average min distance: ", sumdist/nseats)
+
 
 ## plot best results
 import numpy as np
@@ -93,15 +85,6 @@ plt.grid(alpha=0.3)
 plt.savefig('maxmin.png')
 plt.show()
 
-x = [a_tuple[0] for a_tuple in sumdistcomb]
-y = [a_tuple[1] for a_tuple in sumdistcomb]
-plt.scatter(x, y, s=nrows*ncols*60/nseats, c=colors, alpha=0.7)
-plt.title("Maximize average distance")
-plt.xticks(np.arange(min(x), max(x)+1, 1.0))
-plt.yticks(np.arange(min(y), max(y)+1, 1.0))
-plt.grid(alpha=0.3)
-plt.savefig('maxavg.png')
-plt.show()
 
 
 
